@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '192.168.179.240',  # ← ваш IP
     '192.168.179.240:8000',  # ← с портом (если нужно)
-    'https://www.pythonanywhere.com'
+    'alexdirect.pythonanywhere.com'
     ]
 
 
