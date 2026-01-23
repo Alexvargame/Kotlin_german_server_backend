@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*3xg6)c65-md_=s%20^6zurhd9bshc(t$b6*a^*@!gbf(blrz7'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -145,13 +145,6 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@example.com'
 
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'smtp.gmail.com'           # SMTP сервер Gmail
-#EMAIL_USE_TLS = True                     # Используем TLS
-#EMAIL_PORT = 587                         # Порт TLS
-#EMAIL_HOST_USER = 'alex.direct.test@gmail.com' # Ваш email для отправки
-# EMAIL_HOST_PASSWORD = 'qsczse11' # qsczse11 Пароль приложения Gmail (не обычный)
-# DEFAULT_FROM_EMAIL = 'noreply@example.com' # Адрес, который видит пользователь
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -159,5 +152,5 @@ EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # обязательно так для SendGrid
-EMAIL_HOST_PASSWORD = "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"  # сюда вставляем сгенерированный ключ
+EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'a_odegov@ukr.net'
