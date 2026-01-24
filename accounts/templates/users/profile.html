@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto bg-white shadow p-6 rounded-xl">
+  <h2 class="text-2xl font-semibold mb-6 text-black">
+    {% if is_admin_editing %}
+      Редактирование пользователя (админ)
+    {% else %}
+      Мой профиль
+    {% endif %}
+  </h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-2 gap-6">
+
+      {% if is_admin_editing %}
+        {# === Редактируемые поля администратора === #}
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-black">Роль</label>
+            <select name="user_role" class="w-full border rounded p-2 text-black">
+              {% for role in roles %}
+                <option value="{{ role.id }}" {% if role.name == user_profile.user_role %}selected{% endif %}>
+                  {{ role.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Активен</label>
+            <input type="checkbox" name="is_active" {% if user_profile.is_active %}checked{% endif %} class="h-4 w-4" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Администратор</label>
+            <input type="checkbox" name="is_admin" {% if user_profile.is_admin %}checked{% endif %} class="h-4 w-4" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Очки (score)</label>
+            <input type="number" name="score" value="{{ user_profile.score }}" class="w-full border rounded p-2 text-black" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-black">Жизни (lifes)</label>
+            <input type="number" name="lifes" value="{{ user_profile.lifes }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Пароль для телеграм-бота</label>
+            <input type="text" name="user_bot_pass" value="{{ user_profile.user_bot_pass }}" class="w-full border rounded p-2 text-black" />
+          </div>
+        </div>
+
+        {# Правая колонка (нельзя редактировать) #}
+        <div class="space-y-4 opacity-80">
+          <div>
+            <label class="block text-sm font-medium text-black">Никнейм</label>
+            <input type="text" value="{{ user_profile.username }}" class="w-full border rounded p-2 bg-gray-100 text-black" disableds />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Имя</label>
+            <input type="text" value="{{ user_profile.name }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Фамилия</label>
+            <input type="text" value="{{ user_profile.surname }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Email</label>
+            <input type="text" value="{{ user_profile.email }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Телефон</label>
+            <input type="text" value="{{ user_profile.phone }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Telegram</label>
+            <input type="text" value="{{ user_profile.telegram_username }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Последний логин</label>
+            <input type="text" value="{{ user_profile.last_login_date }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+        </div>
+
+      {% else %}
+        {# === Редактируемые поля обычного пользователя === #}
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-black">Имя</label>
+            <input type="text" name="name" value="{{ user_profile.name }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Фамилия</label>
+            <input type="text" name="surname" value="{{ user_profile.surname }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Email</label>
+            <input type="email" name="email" value="{{ user_profile.email }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Телефон</label>
+            <input type="text" name="phone" value="{{ user_profile.phone }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Telegram</label>
+            <input type="text" name="telegram_username" value="{{ user_profile.telegram_username }}" class="w-full border rounded p-2 text-black" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Пароль для телеграм-бота</label>
+            <input type="text" name="user_bot_pass" value="{{ user_profile.user_bot_pass }}" class="w-full border rounded p-2 text-black" />
+          </div>
+        </div>
+
+        {# Правая колонка — только для просмотра #}
+        <div class="space-y-4 opacity-80">
+          <div>
+            <label class="block text-sm font-medium text-black">Роль</label>
+            <input type="text" value="{{ user_profile.user_role }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Очки (score)</label>
+            <input type="text" value="{{ user_profile.score }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Жизни (lifes)</label>
+            <input type="text" value="{{ user_profile.lifes }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Активен</label>
+            <input type="text" value="{% if user_profile.is_active %}Да{% else %}Нет{% endif %}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Никнейм</label>
+            <input type="text" value="{% if user_profile.username %}Да{% else %}Нет{% endif %}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-black">Последний логин</label>
+            <input type="text" value="{{ user_profile.last_login_date }}" class="w-full border rounded p-2 bg-gray-100 text-black" disabled />
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="mt-6">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Сохранить
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

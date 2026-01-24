@@ -1,6 +1,7 @@
 import uuid
 
 from rest_framework.views import APIView
+from django.views.generic import TemplateView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
@@ -108,3 +109,8 @@ class ProfileView(APIView):
         serializer = UserSerializer(request.user)
         print(serializer.data)
         return Response(serializer.data)
+
+
+
+class VerificationSuccessView(TemplateView):
+    template_name = 'verification_success.html'

@@ -1,0 +1,30 @@
+{% extends 'main_page.html' %}
+
+{% block title %}Регистрация | Игры в слова{% endblock %}
+
+{% block content %}
+<main class="container mx-auto p-4">
+  <!-- Header Section -->
+  <section class="text-center my-8">
+    <h1 class="text-4xl font-bold mb-4">Регистрация</h1>
+    <p class="mb-4 text-lg">Создайте аккаунт для доступа к играм и упражнениям.</p>
+  </section>
+
+  <!-- Registration Form -->
+  <section class="bg-white text-black p-6 rounded-md shadow-md">
+    <form method="POST" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}  <!-- Простая генерация формы -->
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700">
+        Зарегистрироваться
+      </button>
+    </form>
+
+    <p class="text-center mt-4">
+      Уже есть аккаунт? <a href="{% url 'api:users:user_login'%}" class="text-blue-500">Войти</a>
+    </p>
+  </section>
+</main>
+{% endblock %}

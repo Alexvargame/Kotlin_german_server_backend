@@ -1,0 +1,28 @@
+{% extends 'main_page.html' %}
+
+{% block content %}
+  <h2>Вход в систему</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label for="id_email">Email:</label>
+      {{ form.email}}
+    </div>
+    <div>
+      <label for="id_password">Пароль:</label>
+      {{ form.password }}
+    </div>
+    <button type="submit">Войти</button>
+  </form>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <p>Если у вас нет аккаунта, <a href="{% url 'api:users:user_registration' %}">зарегистрируйтесь</a></p>
+{% endblock %}

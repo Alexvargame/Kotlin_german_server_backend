@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4 text-black">Пользователи</h1>
+  <!-- Форма фильтра -->
+  <form method="get" class="flex flex-wrap gap-4 mb-6">
+    <input type="text" name="email" placeholder="Email" value="{{ request.GET.email|default:'' }}" class="border rounded p-2 text-black" />
+    <select name="user_role" class="border rounded p-2 text-black">
+      <option value="">Все роли</option>
+      {% for role in roles %}
+        <option value="{{ role.id }}" {% if request.GET.user_role == role.id|stringformat:"s" %}selected{% endif %}>{{ role.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Применить</button>
+  </form>
+
+  {% if users %}
+    <table class="w-full border-collapse border border-gray-300 text-black">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="border p-2 text-left">ID</th>
+          <th class="border p-2 text-left">Имя</th>
+          <th class="border p-2 text-left">Фамилия</th>
+          <th class="border p-2 text-left">Username</th>
+          <th class="border p-2 text-left">Email</th>
+          <th class="border p-2 text-left">Телефон</th>
+          <th class="border p-2 text-left">Роль</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td class="border p-2 text-white">
+            <a href="{% url 'api:users:user_update' user_id=user.id %}" class="text-white hover:underline">
+              {{ user.id }}
+            </a>
+          </td>
+          <td class="border p-2 text-white">{{ user.name }}</td>
+          <td class="border p-2 text-white">{{ user.surname }}</td>
+          <td class="border p-2 text-white">{{ user.username }}</td>
+          <td class="border p-2 text-white">{{ user.email }}</td>
+          <td class="border p-2 text-white">{{ user.phone }}</td>
+          <td class="border p-2 text-white">{{ user.user_role }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Пагинация -->
+    {% if is_paginated %}
+    <div class="mt-4 flex justify-between">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border rounded">Назад</a>
+      {% endif %}
+      <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border rounded">Вперед</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% else %}
+    <p>Пользователи не найдены.</p>
+  {% endif %}
+</div>
+{% endblock %}
