@@ -45,15 +45,25 @@ def send_test_email(to_email):
 
 def send_verification_email(email, token):
     verify_url = f'https://alexdirect.pythonanywhere.com/api/verify-email/?token={token}'
-
+    print(f"[DEBUG][1] Вызов send_verification_email для {email}")
+    print(f"[DEBUG][2] Переменная PYTHONANYWHERE_DOMAIN = {os.environ.get('PYTHONANYWHERE_DOMAIN')}")
+    print(f"[SHOWTIME] 1. Ключ SENDGRID_API_KEY в настройках: {settings.SENDGRID_API_KEY}")
+    print(f"[SHOWTIME] 2. Ключ из окружения напрямую: {os.getenv('SENDGRID_API_KEY')}")
+    print(f"[SHOWTIME] 3. PYTHONANYWHERE_DOMAIN из окружения: {os.getenv('PYTHONANYWHERE_DOMAIN')}")
+    print(f"[SHOWTIME] 4. Весь os.environ содержит PYTHONANYWHERE_DOMAIN?: {'PYTHONANYWHERE_DOMAIN' in os.environ}")
     # Проверяем, находимся ли на PythonAnywhere
     if 'PYTHONANYWHERE_DOMAIN' in os.environ:  # Более надёжный способ
+        print(f"[DEBUG][3] Условие 'PYTHONANYWHERE_DOMAIN in os.environ' = ИСТИНА. Использую SendGrid API.")
         try:
             return send_email_via_sendgrid_api(email, token)
         except ImportError as e:
-            print(f"⚠️ Cannot import SendGrid helper: {e}")
+            print(f"⚠️ [DEBUG][4] Cannot import SendGrid helper: {e}")
+            # Продолжаем на SMTP (для надёжности)
+        except Exception as e:
+            print(f"⚠️ [DEBUG][5] Неизвестная ошибка в send_email_via_sendgrid_api: {e}")
             # Продолжаем на SMTP (для надёжности)
 
+    print(f"[DEBUG][6] Использую запасной путь: SMTP.")
     # Локальная отправка через SMTP (работает у тебя на компьютере)
     try:
         send_mail(
@@ -63,8 +73,8 @@ def send_verification_email(email, token):
             recipient_list=[email],
             fail_silently=False,
         )
-        print(f"✅ Email sent via SMTP to {email}")
+        print(f"✅ [DEBUG][7] Email sent via SMTP to {email}")
         return True
     except Exception as e:
-        print(f"❌ Email send failed: {e}")
+        print(f"❌ [DEBUG][8] Email send failed: {e}")
         return False
