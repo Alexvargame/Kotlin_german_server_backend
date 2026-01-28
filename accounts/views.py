@@ -1,5 +1,7 @@
 import uuid
 
+from django.shortcuts import redirect
+from django.urls import reverse
 from rest_framework.views import APIView
 from django.views.generic import TemplateView
 from rest_framework.response import Response
@@ -49,7 +51,6 @@ class RegisterView(APIView):
             "uid": user.uid,
             "message": "Verification email sent",
             "email_token": str(verification.token),
-           # "verification": verification
         }, status=status.HTTP_201_CREATED)
 
 
@@ -73,7 +74,8 @@ class VerifyEmailView(APIView):
         verification.is_used = True
         verification.save()
 
-        return Response({"status": "verified"}, status=status.HTTP_200_OK)
+        return redirect(reverse('verification_success'))
+        #return Response({"status": "verified"}, status=status.HTTP_200_OK)
 
 
 class LoginView(APIView):
@@ -114,3 +116,32 @@ class ProfileView(APIView):
 
 class VerificationSuccessView(TemplateView):
     template_name = 'verification_success.html'
+
+
+class SyncUserView(APIView):
+    permission_classes = []  # Не требует авторизации
+
+    def post(self, request):
+        email = request.data.get('email')
+
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Получаем токен пользователя
+        from rest_framework.authtoken.models import Token
+        token, _ = Token.objects.get_or_create(user=user)
+
+        # Возвращаем все необходимые для синхронизации данные
+        return Response({
+            "uid": str(user.uid),
+            "email": user.email,
+            "is_verified": user.is_verified,
+            "login_token": token.key
+        }, status=status.HTTP_200_OK)
+
+

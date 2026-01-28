@@ -8,6 +8,7 @@ from .views import (
     VerifyEmailView,
     ProfileView,
     VerificationSuccessView,
+    SyncUserView,
 )
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path('verify-email/', VerifyEmailView.as_view()),
     path('profile/', ProfileView.as_view()),
     path('verification-success/', VerificationSuccessView.as_view(), name='verification_success'),
+    path('sync-user/', SyncUserView.as_view()),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
