@@ -145,3 +145,54 @@ class SyncUserView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+class ResendVerificationView(APIView):
+    permission_classes = []  # Не требует авторизации
+
+    def post(self, request):
+        email = request.data.get('email')
+
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # 1. Находим пользователя
+            user = User.objects.get(email=email)
+
+            # 2. Если уже верифицирован — ничего не делаем
+            if user.is_verified:
+                return Response({"message": "Email already verified"}, status=status.HTTP_200_OK)
+
+            # 3. Пытаемся найти существующий НЕиспользованный токен
+            try:
+                verification = EmailVerification.objects.get(user=user, is_used=False)
+
+                # Проверяем, не истёк ли токен
+                if verification.expires_at < timezone.now():
+                    # Если истёк — помечаем как использованный и создаём новый
+                    verification.is_used = True
+                    verification.save()
+                    raise EmailVerification.DoesNotExist  # Перейдём к созданию нового
+
+            except EmailVerification.DoesNotExist:
+                # Если нет активного токена — создаём новый (как при регистрации)
+                email_token = uuid.uuid4()
+                verification = EmailVerification.objects.create(
+                    user=user,
+                    token=email_token,
+                    expires_at=timezone.now() + timezone.timedelta(hours=24),
+                    is_used=False
+                )
+
+            # 4. Отправляем письмо с ЭТИМ токеном (старым или новым)
+            send_verification_email(email=user.email, token=verification.token)
+
+            return Response({
+                "message": "Verification email sent",
+                "email": user.email,
+                "token": str(verification.token)
+            }, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
