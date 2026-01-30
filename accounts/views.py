@@ -7,7 +7,8 @@ from django.views.generic import TemplateView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from django.core.mail import send_mail
+
+
 
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -192,6 +193,20 @@ class ResendVerificationView(APIView):
                 "token": str(verification.token)
             }, status=status.HTTP_200_OK)
 
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class DeleteUserView(APIView):
+    permission_classes = []  # Не требует авторизации
+
+    def delete(self, request, uid):  # Принимаем uid из URL
+        try:
+            user = User.objects.get(uid=uid)  # Ищем по полю uid
+            print(user, user.uid)
+            user.delete()
+            return Response({"message": "User deleted"}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

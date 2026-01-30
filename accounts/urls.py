@@ -10,6 +10,7 @@ from .views import (
     VerificationSuccessView,
     SyncUserView,
     ResendVerificationView,
+    DeleteUserView,
 )
 
 urlpatterns = [
@@ -20,6 +21,7 @@ urlpatterns = [
     path('verification-success/', VerificationSuccessView.as_view(), name='verification_success'),
     path('sync-user/', SyncUserView.as_view()),
     path('resend-verification/', ResendVerificationView.as_view(), name='resend_verification'),
+    path('delete/<str:uid>/', DeleteUserView.as_view(), name='delete_user'),
 
 ]
 if settings.DEBUG:
