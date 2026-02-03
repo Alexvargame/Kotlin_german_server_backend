@@ -3,7 +3,8 @@ from .models import User, EmailVerification, PhoneVerification
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'uid', 'is_verified', 'is_active', 'created_at')
+    list_display = ('email', 'uid', 'username', 'score', 'streak_days',
+                    'last_login_date', 'is_verified', 'is_active', 'created_at')
     search_fields = ('email', 'uid')
     list_filter = ('is_verified', 'is_active')
 

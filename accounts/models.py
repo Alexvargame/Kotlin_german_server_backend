@@ -11,14 +11,22 @@ def default_email_expiry():
 
 def default_phone_expiry():
     return timezone.now() + datetime.timedelta(minutes=10)
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, nickname,  email, password=None, **extra_fields):
         if not email:
             raise ValueError('Email must be set')
+        if not nickname:
+            raise ValueError('Nickname must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        extra_fields.setdefault('score', 0)
+        extra_fields.setdefault('streak_days', 0)
+        extra_fields.setdefault('last_login_date', None)
+
+        user = self.model(nickname=nickname, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -39,6 +47,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
+
+    score = models.IntegerField(default=0)  # Баллы
+    streak_days = models.IntegerField(default=0)  # Текущая серия (shockmodLong)
+    username = models.CharField(max_length=100, null=True, blank=True, default='')  # Никнейм
+    last_login_date = models.DateTimeField(null=True, blank=True)  # Дата последнего входа
+    last_session_date = models.BigIntegerField(null=True, blank=True)
 
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

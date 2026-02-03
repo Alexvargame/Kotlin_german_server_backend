@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, SyncProgressSerializer
 from .models import User, EmailVerification
 
 from accounts.utils import send_verification_email
@@ -28,10 +28,13 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        nickname = serializer.validated_data['nickname']
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-        print(email)
+
+        print(email, nickname)
         user = User.objects.create_user(
+            nickname=nickname,
             email=email,
             password=password
         )
@@ -42,7 +45,7 @@ class RegisterView(APIView):
             expires_at=timezone.now() + timezone.timedelta(hours=24),
             is_used=False
         )
-        print(user, user.email, verification.token)
+        print(user.nickname, user, user.email, verification.token)
 
         send_verification_email(
             email=user.email,#'alex.direct.test@gmail.com', #user.email,
@@ -52,6 +55,9 @@ class RegisterView(APIView):
             "uid": user.uid,
             "message": "Verification email sent",
             "email_token": str(verification.token),
+            "nickname": user.nickname,
+            "score": user.score,
+            "streak_days": user.streak_days,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -145,6 +151,75 @@ class SyncUserView(APIView):
             "login_token": token.key
         }, status=status.HTTP_200_OK)
 
+class SyncUserProgressiveView(APIView):
+    permission_classes = []  # Не требует авторизации
+
+    def post(self, request):
+
+        uid = request.data.get('uid')
+        if not uid:
+            return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(uid=uid)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        app_data = {
+            "score": request.data.get('score'),
+            "streak_days": request.data.get('shockmodLong'),
+            "last_session_date": request.data.get('shockmodNow'),
+        }
+        if app_data["last_session_date"] is None:
+            # Возвращаем данные сервера без обновления
+            return Response({
+                "success": True,
+                "updated": False,
+                "message": "No session date provided, using server data",
+                "score": user.score,
+                "streak_days": user.streak_days,
+                "last_session_date": user.last_session_date if user.last_session_date else 0,
+                "user": {
+                    "uid": str(user.uid),
+                    "email": user.email,
+                    "username": user.username,
+                    "is_verified": user.is_verified
+                }
+            })
+        server_data = {
+            'score': user.score,
+            'streak_days': user.streak_days,
+            'last_session_date': user.last_session_date if user.last_session_date else 0
+        }
+        app_date = app_data['last_session_date'] or 0
+        server_date = server_data['last_session_date'] or 0
+        if app_date > server_date:
+            # Обновляем сервер данными из приложения
+            user.score = app_data['score']
+            user.streak_days = app_data['streak_days']
+            user.last_session_date = app_data['last_session_date']
+            user.save()
+            updated = True
+            returned_data = app_data
+        else:
+            # Используем данные сервера (они новее или равны)
+            updated = False
+            returned_data = server_data
+
+        # Возвращаем все необходимые для синхронизации данные
+        return Response({
+            "success": True,
+            "updated": updated,
+            "message": "Server data updated" if updated else "Using server data",
+            "score": returned_data['score'],
+            "streak_days": returned_data['streak_days'],
+            "last_session_date": returned_data['last_session_date'],
+            "user": {
+                "uid": str(user.uid),
+                "email": user.email,
+                "username": user.username,
+                "is_verified": user.is_verified
+            }
+        }, status=status.HTTP_200_OK)
 
 class ResendVerificationView(APIView):
     permission_classes = []  # Не требует авторизации
