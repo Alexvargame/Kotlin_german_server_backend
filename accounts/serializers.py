@@ -27,8 +27,8 @@ class RegisterSerializer(serializers.Serializer):
         """Валидация username"""
         if not value.strip():
             raise serializers.ValidationError("Username cannot be empty")
-        if len(value) < 3:
-            raise serializers.ValidationError("Username must be at least 3 characters")
+        # if len(value) < 3:
+        #     raise serializers.ValidationError("Username must be at least 3 characters")
         if len(value) > 100:
             raise serializers.ValidationError("Username is too long")
         return value.strip()
