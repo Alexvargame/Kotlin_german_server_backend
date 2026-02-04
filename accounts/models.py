@@ -16,17 +16,18 @@ def default_phone_expiry():
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, nickname,  email, password=None, **extra_fields):
+    def create_user(self, username,  email, password=None, **extra_fields):
         if not email:
             raise ValueError('Email must be set')
-        if not nickname:
-            raise ValueError('Nickname must be set')
+        if not username\
+                :
+            raise ValueError('Username must be set')
         email = self.normalize_email(email)
         extra_fields.setdefault('score', 0)
         extra_fields.setdefault('streak_days', 0)
         extra_fields.setdefault('last_login_date', None)
 
-        user = self.model(nickname=nickname, email=email, **extra_fields)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
