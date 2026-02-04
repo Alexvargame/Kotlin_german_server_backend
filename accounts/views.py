@@ -28,13 +28,13 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        nickname = serializer.validated_data['username']
+        username = serializer.validated_data['username']
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
 
-        print(email, nickname)
+        print(email, username)
         user = User.objects.create_user(
-            nickname=nickname,
+            username=username,
             email=email,
             password=password
         )
@@ -45,7 +45,7 @@ class RegisterView(APIView):
             expires_at=timezone.now() + timezone.timedelta(hours=24),
             is_used=False
         )
-        print(user.nickname, user, user.email, verification.token)
+        print(user.username, user, user.email, verification.token)
 
         send_verification_email(
             email=user.email,#'alex.direct.test@gmail.com', #user.email,
@@ -55,7 +55,7 @@ class RegisterView(APIView):
             "uid": user.uid,
             "message": "Verification email sent",
             "email_token": str(verification.token),
-            "nickname": user.nickname,
+            "username": user.username,
             "score": user.score,
             "streak_days": user.streak_days,
         }, status=status.HTTP_201_CREATED)
