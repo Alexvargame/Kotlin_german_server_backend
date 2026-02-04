@@ -169,6 +169,7 @@ class SyncUserProgressiveView(APIView):
             "streak_days": request.data.get('shockmodLong'),
             "last_session_date": request.data.get('shockmodNow'),
         }
+        print('APP_DATA', app_data)
         if app_data["last_session_date"] is None:
             # Возвращаем данные сервера без обновления
             return Response({
@@ -190,8 +191,10 @@ class SyncUserProgressiveView(APIView):
             'streak_days': user.streak_days,
             'last_session_date': user.last_session_date if user.last_session_date else 0
         }
+        print("SERVER DATA", server_data)
         app_date = app_data['last_session_date'] or 0
         server_date = server_data['last_session_date'] or 0
+        print(app_data['last_session_date'], server_data['last_session_date'])
         if app_date > server_date:
             # Обновляем сервер данными из приложения
             user.score = app_data['score']
@@ -200,6 +203,8 @@ class SyncUserProgressiveView(APIView):
             user.save()
             updated = True
             returned_data = app_data
+            print('USER', user)
+
         else:
             # Используем данные сервера (они новее или равны)
             updated = False
