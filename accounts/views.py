@@ -155,7 +155,7 @@ class SyncUserProgressiveView(APIView):
     permission_classes = []  # Не требует авторизации
 
     def post(self, request):
-
+        print(request.POST.data)
         uid = request.data.get('uid')
         if not uid:
             return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
