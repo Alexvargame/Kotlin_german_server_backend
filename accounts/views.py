@@ -166,8 +166,8 @@ class SyncUserProgressiveView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         app_data = {
             "score": request.data.get('score'),
-            "streak_days": request.data.get('shockmodLong'),
-            "last_session_date": request.data.get('shockmodNow'),
+            "streak_days": request.data.get('streak_days'),
+            "last_session_date": request.data.get('last_session_date'),
         }
         print('APP_DATA', app_data)
         if app_data["last_session_date"] is None:
