@@ -12,6 +12,7 @@ from .views import (
     ResendVerificationView,
     DeleteUserView,
     SyncUserProgressiveView,
+    RatingView,
 )
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
     path('resend-verification/', ResendVerificationView.as_view(), name='resend_verification'),
     path('delete/<str:uid>/', DeleteUserView.as_view(), name='delete_user'),
     path('sync-progress/', SyncUserProgressiveView.as_view(), name='sync_progress'),
+    path('rating/', RatingView.as_view(), name='rating'),
 
 ]
 if settings.DEBUG:

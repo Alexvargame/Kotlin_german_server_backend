@@ -291,3 +291,44 @@ class DeleteUserView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class RatingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print('RATING', request.user)
+        score_users = User.objects.all().order_by('-score')
+        score_users_list = list(score_users.values_list('id', flat=True))
+        try:
+            current_user_score_rank = score_users_list.index(request.user.id) + 1
+        except ValueError:
+            current_user_score_rank = None
+        score_users = score_users[:10]
+
+        shockmod_users = User.objects.all().order_by('-streak_days')[:10]
+        score_shockmod_list = list(shockmod_users.values_list('id', flat=True))
+        try:
+            current_user_shockmod_rank = score_shockmod_list.index(request.user.id) + 1
+        except ValueError:
+            current_user_shockmod_rank = None
+        shockmod_users = shockmod_users[:10]
+        serializer_score = UserSerializer(score_users, many=True)
+        serializer_shockmod = UserSerializer(shockmod_users, many=True)
+        print("SCORE",serializer_score.data)
+        print("SHOCK", serializer_shockmod.data)
+        return Response(
+            {
+                'score_rating':
+                    {
+                        'type': 'score',
+                        'top': serializer_score.data,
+                        'current_user_rank': current_user_score_rank,
+                    },
+                'shockmod_rating':
+                    {
+                        'type': 'shockmod',
+                        'top': serializer_shockmod.data,
+                        'current_user_rank': current_user_shockmod_rank,
+                    },
+                }
+        )
