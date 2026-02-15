@@ -78,3 +78,13 @@ def send_verification_email(email, token):
     except Exception as e:
         print(f"❌ [DEBUG][8] Email send failed: {e}")
         return False
+
+
+def get_max_gallery_avatars(score: int) -> int:
+    if score >= 25000:
+        return 3
+    elif score >= 10000:
+        return 2
+    elif score >= 5000:
+        return 1
+    return 0

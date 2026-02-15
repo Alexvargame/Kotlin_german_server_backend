@@ -63,6 +63,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     avatar_name = models.CharField(max_length=100, null=True, blank=True)
 
+
+    avatar_last_changed = models.DateTimeField(default=timezone.now)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
@@ -92,3 +95,11 @@ class PhoneVerification(models.Model):
         return f"{self.user.phone} - {self.code}"
 
 
+class UserGalleryAvatar(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gallery_avatars')
+    image = models.ImageField(upload_to='uploads/gallery_avatars/')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.image}"

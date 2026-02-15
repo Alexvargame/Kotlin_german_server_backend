@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from .models import User
-
+from django.utils import timezone
 class UserSerializer(serializers.ModelSerializer):
+    avatar_name = serializers.CharField(read_only=True)
+    active_gallery_avatar_url = serializers.SerializerMethodField()
+    avatar_last_changed = serializers.DateTimeField(read_only=True)
     class Meta:
         model = User
         fields = (
@@ -14,7 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
             'is_verified',
             'created_at',
             'last_session_date',
+            'avatar_name',
+            'active_gallery_avatar_url',
+            'avatar_last_changed',
         )
+
+    def get_active_gallery_avatar_url(self, obj):
+        active_avatar = obj.gallery_avatars.filter(is_active=True).first()
+        if active_avatar:
+            return active_avatar.image.url
+        return None
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -43,3 +55,23 @@ class SyncProgressSerializer(serializers.Serializer):
     score = serializers.IntegerField(min_value=0)
     streak_days = serializers.IntegerField(min_value=0)
     last_session_date = serializers.IntegerField(min_value=0, allow_null=True)
+
+# class SelectActiveAvatarSerializator(serializers.Serializer):
+#     avatar_id = serializers.IntegerField()
+#
+#     def validate_avatar_id(self, value):
+#         user =self.context['request'].user
+#         if not user.gallery_avatars.filter(id=value).exists():
+#             raise serializers.ValidationError("Аватар не найден или не принадлежит пользователю")
+#         return value
+#
+#     def set_active_avatar(user, avatar_id):
+#         # Деактивируем все аватары пользователя
+#         user.gallery_avatars.update(is_active=False)
+#         # Активируем выбранный
+#         avatar = user.gallery_avatars.get(id=avatar_id)
+#         avatar.is_active = True
+#         avatar.save()
+#         # Обновляем время последнего изменения
+#         user.avatar_last_changed = timezone.now()
+#         user.save()

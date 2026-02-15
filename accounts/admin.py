@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, EmailVerification, PhoneVerification
+from .models import User, EmailVerification, PhoneVerification, UserGalleryAvatar
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -19,3 +19,6 @@ class PhoneVerificationAdmin(admin.ModelAdmin):
     list_display = ('user', 'code', 'is_used', 'expires_at', 'created_at')
     search_fields = ('user__email', 'code')
     list_filter = ('is_used',)
+@admin.register(UserGalleryAvatar)
+class UserAvatarGallereyAdmin(admin.ModelAdmin):
+    list_display = ('user', 'image', 'is_active', 'created_at')

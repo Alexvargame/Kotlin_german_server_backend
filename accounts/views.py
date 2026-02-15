@@ -15,9 +15,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, SyncProgressSerializer
-from .models import User, EmailVerification
+from .models import User, EmailVerification, UserGalleryAvatar
 
-from accounts.utils import send_verification_email
+from accounts.utils import send_verification_email, get_max_gallery_avatars
 #
 # send_test_email('alex.direct.test@gmail.com')
 
@@ -332,3 +332,101 @@ class RatingView(APIView):
                     },
                 }
         )
+class UploadGalleryAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        max_allowed = get_max_gallery_avatars(user.score)
+        current_count = user.gallery_avatars.count()
+
+        if current_count >= max_allowed:
+            return Response(
+                {"error": "Avatar limit reached"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        image =request.FILES.get('image')
+        if not image:
+            return Response(
+                {"error": "NO IMAGE PROVIDED"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        avatar = UserGalleryAvatar.objects.create(
+            user=user,
+            image=image,
+            is_active=False
+        )
+        user.avatar_last_changed = timezone.now()
+        user.save()
+
+        return Response(
+            {
+                "id": avatar.id,
+                "image_url": avatar.image.url
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+class SelectActiveGalleryAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        image_file = request.FILES.get('image')
+        print(request.data)
+        if not image_file:
+            return Response({"error": "No image provided"}, status=400)
+        filename = image_file.name
+
+        try:
+            # Ищем аватар пользователя по имени файла
+            avatar = user.gallery_avatars.get(image__icontains=filename)
+        except UserGalleryAvatar.DoesNotExist:
+            return Response({"error": "Avatar not found"}, status=404)
+
+        # Сбрасываем все остальные аватары
+        user.gallery_avatars.update(is_active=False)
+
+        # Делаем выбранный аватар активным
+        avatar.is_active = True
+        avatar.save()
+
+        # Обновляем у пользователя
+        user.active_gallery_avatar = avatar
+        user.avatar_last_changed = timezone.now()
+        user.save()
+
+        return Response({
+            "id": avatar.id,
+            "image_url": avatar.image.url,
+            "avatar_last_changed": user.avatar_last_changed
+        }, status=200)
+
+class DeleteGalleryAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        image_file = request.FILES.get('image')
+        print(request.data)
+        print(request.FILES)
+
+        if not image_file:
+            return Response({"error": "No image provided"}, status=400)
+
+        filename = image_file.name
+
+        try:
+            avatar = user.gallery_avatars.get(image__icontains=filename)
+        except UserGalleryAvatar.DoesNotExist:
+            return Response({"error": "Avatar not found"}, status=404)
+        # Если удаляем активный аватар, сбрасываем активный
+        if avatar.is_active:
+            user.gallery_avatars.update(is_active=False)
+
+        avatar.delete()
+        user.avatar_last_changed = timezone.now()
+        user.save()
+
+        return Response({"status": "deleted", "avatar_last_changed": user.avatar_last_changed})
