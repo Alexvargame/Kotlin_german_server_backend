@@ -4,7 +4,8 @@ from django.utils import timezone
 class UserSerializer(serializers.ModelSerializer):
     avatar_name = serializers.CharField(read_only=True)
     active_gallery_avatar_url = serializers.SerializerMethodField()
-    avatar_last_changed = serializers.DateTimeField(read_only=True)
+    #avatar_last_changed = serializers.DateTimeField(read_only=True)
+    avatar_last_changed = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = (
@@ -27,6 +28,11 @@ class UserSerializer(serializers.ModelSerializer):
         if active_avatar:
             return active_avatar.image.url
         return None
+
+    def get_avatar_last_changed(self, obj):
+        if obj.avatar_last_changed:
+            return int(obj.avatar_last_changed.timestamp() * 1000)  # миллисекунды
+        return 0
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
