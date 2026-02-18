@@ -16,6 +16,7 @@ from .views import (
     UploadGalleryAvatarView,
     SelectActiveGalleryAvatarView,
     DeleteGalleryAvatarView,
+    SyncUserAvatarView,
 )
 
 urlpatterns = [
@@ -32,6 +33,7 @@ urlpatterns = [
     path("upload-gallery-avatar/", UploadGalleryAvatarView.as_view()),
     path("select-active-avatar/", SelectActiveGalleryAvatarView.as_view()),
     path("delete-avatar/", DeleteGalleryAvatarView.as_view()),
+    path("upload-avatar/", SyncUserAvatarView.as_view())
 
 ]
 if settings.DEBUG:

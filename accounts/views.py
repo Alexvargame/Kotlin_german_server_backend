@@ -430,3 +430,76 @@ class DeleteGalleryAvatarView(APIView):
         user.save()
 
         return Response({"status": "deleted", "avatar_last_changed": user.avatar_last_changed})
+
+class SyncUserAvatarView(APIView):
+    permission_classes = []  # Не требует авторизации
+
+    def post(self, request):
+        print('AVA_rewuest', request.data)
+        uid = request.data.get('uid')
+        if not uid:
+            return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(uid=uid)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        app_data = {
+            "avatar_name": request.data.get('avatar_name'),
+            "avatar_last_changed": request.data.get('avatar_last_changed'),
+        }
+        print('AVA_APP_DATA', app_data)
+        if app_data["last_session_date"] is None:
+            # Возвращаем данные сервера без обновления
+            return Response({
+                "success": True,
+                "updated": False,
+                "message": "No session date provided, using server data",
+                "score": user.score,
+                "avatar_name": user.avatar_name,
+                "avatar_last_changed": user.avatar_last_changed if user.avatar_last_changed else 0,
+                "user": {
+                    "uid": str(user.uid),
+                    "email": user.email,
+                    "username": user.username,
+                    "is_verified": user.is_verified
+                }
+            })
+        server_data = {
+            'score': user.score,
+            'avatar_name': user.avatar_name,
+            'avatar_last_changed': user.avatar_last_changed if user.avatar_last_changed else 0
+        }
+        print("AVA_SERVER DATA", server_data)
+        app_date = app_data['avatar_last_changed'] or 0
+        server_date = server_data['avatar_last_changed'] or 0
+        print("AVA_",app_data['avatar_last_changed'], server_data['avatar_last_changed'])
+        if app_date > server_date:
+            # Обновляем сервер данными из приложения
+            user.avatar_last_changed = app_data['user.avatar_name']
+            user.avatar_name = app_data['avatar_name']
+            user.save()
+            updated = True
+            returned_data = app_data
+            print('USER', user)
+
+        else:
+            # Используем данные сервера (они новее или равны)
+            updated = False
+            returned_data = server_data
+
+        # Возвращаем все необходимые для синхронизации данные
+        return Response({
+            "success": True,
+            "updated": updated,
+            "message": "Server data updated" if updated else "Using server data",
+            "avatar_name": returned_data['avatar_name'],
+            "streak_days": returned_data['streak_days'],
+            "user.avatar_name": returned_data['user.avatar_name'],
+            "user": {
+                "uid": str(user.uid),
+                "email": user.email,
+                "username": user.username,
+                "is_verified": user.is_verified
+            }
+        }, status=status.HTTP_200_OK)
