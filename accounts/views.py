@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+import datetime
 
 
 
@@ -473,10 +474,11 @@ class SyncUserAvatarView(APIView):
         print("AVA_SERVER DATA", server_data)
         app_avatar_date = app_data['avatar_last_changed'] or 0
         server_avatar_date = server_data['avatar_last_changed'] or 0
+        server_avatar_date = int(server_avatar_date.timestamp() * 1000)
         print("AVA_",app_avatar_date, server_avatar_date)
         if app_avatar_date > server_avatar_date:
             # Обновляем сервер данными из приложения
-            user.avatar_last_changed = app_data['avatar_name']
+            user.avatar_last_changed = datetime.datetime.utcfromtimestamp(app_avatar_date / 1000).replace(tzinfo=datetime.timezone.utc)
             user.avatar_name = app_data['avatar_name']
             user.save()
             updated = True
