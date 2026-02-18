@@ -449,7 +449,7 @@ class SyncUserAvatarView(APIView):
             "avatar_last_changed": request.data.get('avatar_last_changed'),
         }
         print('AVA_APP_DATA', app_data)
-        if app_data["last_session_date"] is None:
+        if app_data["avatar_last_changed"] is None:
             # Возвращаем данные сервера без обновления
             return Response({
                 "success": True,
