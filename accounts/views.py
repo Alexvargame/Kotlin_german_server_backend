@@ -476,7 +476,7 @@ class SyncUserAvatarView(APIView):
         print("AVA_",app_data['avatar_last_changed'], server_data['avatar_last_changed'])
         if app_date > server_date:
             # Обновляем сервер данными из приложения
-            user.avatar_last_changed = app_data['user.avatar_name']
+            user.avatar_last_changed = app_data['avatar_name']
             user.avatar_name = app_data['avatar_name']
             user.save()
             updated = True
@@ -494,8 +494,7 @@ class SyncUserAvatarView(APIView):
             "updated": updated,
             "message": "Server data updated" if updated else "Using server data",
             "avatar_name": returned_data['avatar_name'],
-            "streak_days": returned_data['streak_days'],
-            "user.avatar_name": returned_data['user.avatar_name'],
+            "avatar_last_changed": returned_data['avatar_last_changed'],
             "user": {
                 "uid": str(user.uid),
                 "email": user.email,
