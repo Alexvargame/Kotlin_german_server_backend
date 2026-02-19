@@ -1,5 +1,6 @@
 import uuid
 
+from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect
 from django.urls import reverse
 from rest_framework.views import APIView
@@ -507,8 +508,8 @@ class SyncUserAvatarView(APIView):
 
 
 class SyncUserGalleryAvatarView(APIView):
-    permission_classes = []  # Не требует авторизации
-
+    #permission_classes = []  # Не требует авторизации
+    permission_classes = [AllowAny]
     def post(self, request):
         print('AVA_GAL_rewuest', request.data)
         uid = request.data.get('uid')
