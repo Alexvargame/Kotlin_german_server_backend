@@ -509,6 +509,7 @@ class SyncUserAvatarView(APIView):
 
 class SyncUserGalleryAvatarView(APIView):
     #permission_classes = []  # Не требует авторизации
+    authentication_classes = []
     permission_classes = [AllowAny]
     def post(self, request):
         print('AVA_GAL_rewuest', request.data)
