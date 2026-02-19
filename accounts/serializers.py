@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, UserGalleryAvatar
 from django.utils import timezone
 class UserSerializer(serializers.ModelSerializer):
     avatar_name = serializers.CharField(read_only=True)
