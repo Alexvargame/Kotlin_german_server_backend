@@ -62,6 +62,12 @@ class SyncProgressSerializer(serializers.Serializer):
     streak_days = serializers.IntegerField(min_value=0)
     last_session_date = serializers.IntegerField(min_value=0, allow_null=True)
 
+
+class GalleryAvatarUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGalleryAvatar
+        fields = ['id', 'image', 'is_active', 'created_at']
+
 # class SelectActiveAvatarSerializator(serializers.Serializer):
 #     avatar_id = serializers.IntegerField()
 #

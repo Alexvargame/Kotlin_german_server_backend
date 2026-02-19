@@ -94,10 +94,12 @@ class PhoneVerification(models.Model):
     def __str__(self):
         return f"{self.user.phone} - {self.code}"
 
+def user_avatar_path(instance, filename):
+    return f"uploads/gallery_avatars/user_{instance.user.id}/{filename}"
 
 class UserGalleryAvatar(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gallery_avatars')
-    image = models.ImageField(upload_to='uploads/gallery_avatars/')
+    image = models.ImageField(upload_to=user_avatar_path)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
 
