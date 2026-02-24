@@ -511,7 +511,9 @@ class SyncUserGalleryAvatarView(APIView):
     # permission_classes = [IsAuthenticated]  # Не требует авторизации
     authentication_classes = []
     permission_classes = [AllowAny]
+
     def post(self, request):
+
         print('AVA_GAL_rewuest', request.data)
         uid = request.data.get('uid')
         timestamp = request.data.get('avatar_last_changed')

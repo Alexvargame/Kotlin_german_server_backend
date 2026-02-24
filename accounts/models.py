@@ -62,6 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     avatar_name = models.CharField(max_length=100, null=True, blank=True)
+    avatar_path = models.CharField(max_length=100, null=True, blank=True)
 
 
     avatar_last_changed = models.DateTimeField(default=timezone.now)
