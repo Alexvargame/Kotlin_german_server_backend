@@ -19,8 +19,7 @@ class UserManager(BaseUserManager):
     def create_user(self, username,  email, password=None, **extra_fields):
         if not email:
             raise ValueError('Email must be set')
-        if not username\
-                :
+        if not username:
             raise ValueError('Username must be set')
         email = self.normalize_email(email)
         extra_fields.setdefault('score', 0)
@@ -41,7 +40,12 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email, password, **extra_fields)
+        username = extra_fields.pop('username', None)
+        if not username:
+            # Генерируем username из email, если не передан
+            username = email.split('@')[0]
+
+        return self.create_user(username,email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
     uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
