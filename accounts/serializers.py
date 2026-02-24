@@ -18,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
             'created_at',
             'last_session_date',
             'avatar_name',
+            'avatar_path',
             'active_gallery_avatar_url',
             'avatar_last_changed',
         )
