@@ -169,6 +169,7 @@ class SyncUserProgressiveView(APIView):
         app_data = {
             "score": request.data.get('score'),
             "streak_days": request.data.get('streak_days'),
+            "lifes": request.data.get('lifes'),
             "last_session_date": request.data.get('last_session_date'),
         }
         print('APP_DATA', app_data)
@@ -180,6 +181,7 @@ class SyncUserProgressiveView(APIView):
                 "message": "No session date provided, using server data",
                 "score": user.score,
                 "streak_days": user.streak_days,
+                "lifes": user.lifes,
                 "last_session_date": user.last_session_date if user.last_session_date else 0,
                 "user": {
                     "uid": str(user.uid),
@@ -191,6 +193,7 @@ class SyncUserProgressiveView(APIView):
         server_data = {
             'score': user.score,
             'streak_days': user.streak_days,
+            'lifes': user.lifes,
             'last_session_date': user.last_session_date if user.last_session_date else 0
         }
         print("SERVER DATA", server_data)
@@ -201,6 +204,7 @@ class SyncUserProgressiveView(APIView):
             # Обновляем сервер данными из приложения
             user.score = app_data['score']
             user.streak_days = app_data['streak_days']
+            user.lifes = app_data['lifes']
             user.last_session_date = app_data['last_session_date']
             user.save()
             updated = True
@@ -219,6 +223,7 @@ class SyncUserProgressiveView(APIView):
             "message": "Server data updated" if updated else "Using server data",
             "score": returned_data['score'],
             "streak_days": returned_data['streak_days'],
+            "lifes": returned_data['lifes'],
             "last_session_date": returned_data['last_session_date'],
             "user": {
                 "uid": str(user.uid),
@@ -369,6 +374,7 @@ class UploadGalleryAvatarView(APIView):
             },
             status=status.HTTP_201_CREATED
         )
+
 
 class SelectActiveGalleryAvatarView(APIView):
     permission_classes = [IsAuthenticated]

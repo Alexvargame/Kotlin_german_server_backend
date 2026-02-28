@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True, null=True)
 
     score = models.IntegerField(default=0)  # Баллы
-    lives = models.IntegerField(default=5)
+    lifes = models.IntegerField(default=5)
     streak_days = models.IntegerField(default=0)  # Текущая серия (shockmodLong)
     username = models.CharField(max_length=100, null=True, blank=True, default='')  # Никнейм
     last_login_date = models.DateTimeField(null=True, blank=True)  # Дата последнего входа

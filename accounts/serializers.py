@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'score',
             'streak_days',
+            'lifes',
             'phone',
             'is_verified',
             'created_at',
