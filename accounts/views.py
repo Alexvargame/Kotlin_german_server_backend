@@ -483,7 +483,7 @@ class SyncUserAvatarView(APIView):
         server_avatar_date = server_data['avatar_last_changed'] or 0
         server_avatar_date = int(server_avatar_date.timestamp() * 1000)
         print("AVA_",app_avatar_date, server_avatar_date)
-        if app_avatar_date > server_avatar_date:
+        if app_avatar_date >= server_avatar_date:
             # Обновляем сервер данными из приложения
             user.avatar_last_changed = datetime.datetime.utcfromtimestamp(app_avatar_date / 1000).replace(tzinfo=datetime.timezone.utc)
             user.avatar_name = app_data['avatar_name']
