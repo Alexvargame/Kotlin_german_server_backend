@@ -200,7 +200,7 @@ class SyncUserProgressiveView(APIView):
         app_date = app_data['last_session_date'] or 0
         server_date = server_data['last_session_date'] or 0
         print(app_data['last_session_date'], server_data['last_session_date'])
-        if app_date > server_date:
+        if app_date >= server_date:
             # Обновляем сервер данными из приложения
             user.score = app_data['score']
             user.streak_days = app_data['streak_days']
