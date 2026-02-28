@@ -6,8 +6,10 @@ from django.utils import timezone
 
 import datetime
 
+
 def default_email_expiry():
     return timezone.now() + datetime.timedelta(hours=24)
+
 
 def default_phone_expiry():
     return timezone.now() + datetime.timedelta(minutes=10)
@@ -54,6 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True, null=True)
 
     score = models.IntegerField(default=0)  # Баллы
+    lives = models.IntegerField(default=5)
     streak_days = models.IntegerField(default=0)  # Текущая серия (shockmodLong)
     username = models.CharField(max_length=100, null=True, blank=True, default='')  # Никнейм
     last_login_date = models.DateTimeField(null=True, blank=True)  # Дата последнего входа
@@ -80,6 +83,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 
+
 class EmailVerification(models.Model):
 
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='email_verifications')
@@ -87,8 +91,10 @@ class EmailVerification(models.Model):
     expires_at = models.DateTimeField(default=default_email_expiry())
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return f"{self.user.email} - {self.token}"
+
 
 class PhoneVerification(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='phone_verifications')
@@ -96,11 +102,14 @@ class PhoneVerification(models.Model):
     expires_at = models.DateTimeField(default=default_phone_expiry())
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return f"{self.user.phone} - {self.code}"
 
+
 def user_avatar_path(instance, filename):
     return f"uploads/gallery_avatars/user_{instance.user.id}/{filename}"
+
 
 class UserGalleryAvatar(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gallery_avatars')
