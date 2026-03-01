@@ -10,11 +10,15 @@ from rest_framework import status
 from django.utils import timezone
 import datetime
 
-
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
 
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, SyncProgressSerializer
 from .models import User, EmailVerification, UserGalleryAvatar
@@ -513,18 +517,66 @@ class SyncUserAvatarView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+# class SyncUserGalleryAvatarView(APIView):
+#     # permission_classes = [IsAuthenticated]  # Не требует авторизации
+#     authentication_classes = []
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#
+#         print('AVA_GAL_rewuest', request.data)
+#         uid = request.data.get('uid')
+#         timestamp = request.data.get('avatar_last_changed')
+#         image_file = request.FILES.get('file')
+#         print(uid, timestamp, image_file)
+#         if not uid:
+#             return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             user = User.objects.get(uid=uid)
+#         except User.DoesNotExist:
+#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+#
+#         avatar = UserGalleryAvatar.objects.create(
+#             user=user,
+#             image=image_file,
+#             is_active=True
+#         )
+#         UserGalleryAvatar.objects.filter(user=user, is_active=True).exclude(id=avatar.id).update(is_active=False)
+#
+#         user.avatar_name = avatar.image.name
+#         user.avatar_last_changed = timezone.now()
+#         user.save()
+#         return Response({
+#             "success": True,
+#             "updated": False,
+#             "message": "No session date provided, using server data",
+#             "score": user.score,
+#             "avatar_name": user.avatar_name,
+#             "avatar_last_changed": user.avatar_last_changed if user.avatar_last_changed else 0,
+#             "user": {
+#                 "uid": str(user.uid),
+#                 "email": user.email,
+#                 "username": user.username,
+#                 "is_verified": user.is_verified
+#             }
+#         }, status=status.HTTP_200_OK)
+
 class SyncUserGalleryAvatarView(APIView):
-    # permission_classes = [IsAuthenticated]  # Не требует авторизации
-    authentication_classes = []
-    permission_classes = [AllowAny]
+    # Не требует авторизации
+    # authentication_classes = []
+    permission_classes = [IsAuthenticated]
+
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request):
+        print('🔹 AVA_GAL_request:', request.data)
 
-        print('AVA_GAL_rewuest', request.data)
         uid = request.data.get('uid')
         timestamp = request.data.get('avatar_last_changed')
-        image_file = request.FILES.get('file')
-        print(uid, timestamp, image_file)
+        image_file = request.FILES.get('image')
+        print('🔹 UID:', uid, 'Timestamp:', timestamp, 'File:', image_file)
+
         if not uid:
             return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -533,26 +585,81 @@ class SyncUserGalleryAvatarView(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        avatar = UserGalleryAvatar.objects.create(
-            user=user,
-            image=image_file,
-            is_active=True
-        )
-        UserGalleryAvatar.objects.filter(user=user, is_active=True).exclude(id=avatar.id).update(is_active=False)
+        # ------------------------------
+        # 1️⃣ Удаляем старые аватары (файлы + записи)
+        # ------------------------------
+        old_avatars = UserGalleryAvatar.objects.filter(user=user)
+        print(f"🔹 Old avatars count: {old_avatars.count()}")
+        for old in old_avatars:
+            if old.image:
+                print(f"🔹 Deleting old file: {old.image.name}")
+                old.image.delete(save=False)
+            old.delete()
 
-        user.avatar_name = avatar.image.name
-        user.avatar_last_changed = timezone.now()
-        user.save()
+        # ------------------------------
+        # 2️⃣ Создаём версии full + small
+        # ------------------------------
+        try:
+            img = Image.open(image_file)
+            img = img.convert("RGB")
+            # Full avatar (максимум 512x512)
+            img_full = img.copy()
+            img_full.thumbnail((512, 512))
+            buffer_full = BytesIO()
+            img_full.save(buffer_full, format="WEBP", quality=80)
+            full_file = ContentFile(buffer_full.getvalue(), name=f"user_{user.id}_full.webp")
+            print(f"🔹 Full avatar size: {len(buffer_full.getvalue())} bytes")
+
+            # Small avatar (например 64x64)
+            img_small = img.copy()
+            img_small.thumbnail((64, 64))
+            buffer_small = BytesIO()
+            img_small.save(buffer_small, format="WEBP", quality=80)
+            small_file = ContentFile(buffer_small.getvalue(), name=f"user_{user.id}_small.webp")
+            print(f"🔹 Small avatar size: {len(buffer_small.getvalue())} bytes")
+
+        except Exception as e:
+            print("❌ Error processing image:", e)
+            return Response({"error": f"Image processing failed: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ------------------------------
+        # 3️⃣ Сохраняем новые записи в таблице
+        # ------------------------------
+        try:
+            avatar_full = UserGalleryAvatar.objects.create(
+                user=user,
+                image=full_file,
+                is_active=True
+            )
+            avatar_small = UserGalleryAvatar.objects.create(
+                user=user,
+                image=small_file,
+                is_active=False
+            )
+            print(f"🔹 Saved full avatar id: {avatar_full.id}, small avatar id: {avatar_small.id}")
+
+            # ------------------------------
+            # 4️⃣ Обновляем timestamp на сервере
+            # ------------------------------
+            user.avatar_last_changed = timezone.now()
+            user.save()
+            print(f"🔹 Updated user avatar_last_changed: {user.avatar_last_changed}")
+
+        except Exception as e:
+            print("❌ Error saving avatars:", e)
+            return Response({"error": f"Saving avatars failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("Avatars", user.gallery_avatars.all())
+        # ------------------------------
+        # 5️⃣ Отправляем ответ
+        # ------------------------------
         return Response({
             "success": True,
-            "updated": False,
-            "message": "No session date provided, using server data",
-            "score": user.score,
-            "avatar_name": user.avatar_name,
+            "message": "Gallery avatar uploaded successfully",
             "avatar_last_changed": user.avatar_last_changed if user.avatar_last_changed else 0,
             "user": {
                 "uid": str(user.uid),
                 "email": user.email,
+                "avatars": list(user.gallery_avatars.values()),
                 "username": user.username,
                 "is_verified": user.is_verified
             }

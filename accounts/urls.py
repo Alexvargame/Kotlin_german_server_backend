@@ -31,7 +31,7 @@ urlpatterns = [
     path('delete/<str:uid>/', DeleteUserView.as_view(), name='delete_user'),
     path('sync-progress/', SyncUserProgressiveView.as_view(), name='sync_progress'),
     path('rating/', RatingView.as_view(), name='rating'),
-    path("upload-gallery-avatar/", UploadGalleryAvatarView.as_view()),
+   # path("upload-gallery-avatar/", UploadGalleryAvatarView.as_view()),
     path("select-active-avatar/", SelectActiveGalleryAvatarView.as_view()),
     path("delete-avatar/", DeleteGalleryAvatarView.as_view()),
     path("upload-avatar/", SyncUserAvatarView.as_view()),

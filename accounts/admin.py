@@ -4,7 +4,7 @@ from .models import User, EmailVerification, PhoneVerification, UserGalleryAvata
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('email', 'uid', 'username', 'score', 'streak_days', 'lifes',
-                    'avatar_name', 'avatar_path', 'last_login_date',
+                    'avatar_name', 'avatar_path', 'last_login_date', 'last_session_date',
                     'is_verified', 'is_active', 'created_at')
     search_fields = ('email', 'uid')
     list_filter = ('is_verified', 'is_active')
