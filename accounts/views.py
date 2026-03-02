@@ -573,9 +573,9 @@ class SyncUserGalleryAvatarView(APIView):
         print('🔹 AVA_GAL_request:', request.data)
 
         uid = request.data.get('uid')
-        timestamp = request.data.get('avatar_last_changed')
+        # timestamp = request.data.get('avatar_last_changed')
         image_file = request.FILES.get('image')
-        print('🔹 UID:', uid, 'Timestamp:', timestamp, 'File:', image_file)
+        print('🔹 UID:', uid, 'File:', image_file)
 
         if not uid:
             return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -641,9 +641,9 @@ class SyncUserGalleryAvatarView(APIView):
             # ------------------------------
             # 4️⃣ Обновляем timestamp на сервере
             # ------------------------------
-            user.avatar_last_changed = timezone.now()
+            # user.avatar_last_changed = timezone.now()
             user.save()
-            print(f"🔹 Updated user avatar_last_changed: {user.avatar_last_changed}")
+            # print(f"🔹 Updated user avatar_last_changed: {user.avatar_last_changed}")
 
         except Exception as e:
             print("❌ Error saving avatars:", e)
