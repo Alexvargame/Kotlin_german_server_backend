@@ -5,6 +5,8 @@ class UserSerializer(serializers.ModelSerializer):
     avatar_name = serializers.CharField(read_only=True)
     active_gallery_avatar_url = serializers.SerializerMethodField()
     avatar_last_changed = serializers.SerializerMethodField()
+    avatar_small_url = serializers.SerializerMethodField()
+    avatar_full_url = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = (
@@ -22,6 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar_path',
             'active_gallery_avatar_url',
             'avatar_last_changed',
+            'avatar_small_url',
+            'avatar_full_url',
         )
 
     def get_active_gallery_avatar_url(self, obj):
@@ -31,9 +35,22 @@ class UserSerializer(serializers.ModelSerializer):
         return None
 
     def get_avatar_last_changed(self, obj):
+
         if obj.avatar_last_changed:
             return int(obj.avatar_last_changed.timestamp() * 1000)  # миллисекунды
         return 0
+
+    def get_avatar_small_url(self, obj):
+        obj.refresh_from_db()
+        avatar = obj.gallery_avatars.filter( image__icontains="small").first()
+        if avatar:
+            return avatar.image.url
+        return None
+    def get_avatar_full_url(self, obj):
+        avatar = obj.gallery_avatars.filter( image__icontains="full").first()
+        if avatar:
+            return avatar.image.url
+        return None
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()

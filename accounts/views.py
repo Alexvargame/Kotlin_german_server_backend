@@ -517,50 +517,7 @@ class SyncUserAvatarView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-# class SyncUserGalleryAvatarView(APIView):
-#     # permission_classes = [IsAuthenticated]  # Не требует авторизации
-#     authentication_classes = []
-#     permission_classes = [AllowAny]
-#
-#     def post(self, request):
-#
-#         print('AVA_GAL_rewuest', request.data)
-#         uid = request.data.get('uid')
-#         timestamp = request.data.get('avatar_last_changed')
-#         image_file = request.FILES.get('file')
-#         print(uid, timestamp, image_file)
-#         if not uid:
-#             return Response({"error": "Uid is required"}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         try:
-#             user = User.objects.get(uid=uid)
-#         except User.DoesNotExist:
-#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-#
-#         avatar = UserGalleryAvatar.objects.create(
-#             user=user,
-#             image=image_file,
-#             is_active=True
-#         )
-#         UserGalleryAvatar.objects.filter(user=user, is_active=True).exclude(id=avatar.id).update(is_active=False)
-#
-#         user.avatar_name = avatar.image.name
-#         user.avatar_last_changed = timezone.now()
-#         user.save()
-#         return Response({
-#             "success": True,
-#             "updated": False,
-#             "message": "No session date provided, using server data",
-#             "score": user.score,
-#             "avatar_name": user.avatar_name,
-#             "avatar_last_changed": user.avatar_last_changed if user.avatar_last_changed else 0,
-#             "user": {
-#                 "uid": str(user.uid),
-#                 "email": user.email,
-#                 "username": user.username,
-#                 "is_verified": user.is_verified
-#             }
-#         }, status=status.HTTP_200_OK)
+
 
 class SyncUserGalleryAvatarView(APIView):
     # Не требует авторизации
