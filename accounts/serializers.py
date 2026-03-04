@@ -40,11 +40,19 @@ class UserSerializer(serializers.ModelSerializer):
             return int(obj.avatar_last_changed.timestamp() * 1000)  # миллисекунды
         return 0
 
+    # def get_avatar_small_url(self, obj):
+    #     obj.refresh_from_db()
+    #     avatar = obj.gallery_avatars.filter( image__icontains="small").first()
+    #     if avatar:
+    #         return avatar.image.url
+    #     return None
     def get_avatar_small_url(self, obj):
         obj.refresh_from_db()
+        request = self.context.get('request')
         avatar = obj.gallery_avatars.filter( image__icontains="small").first()
-        if avatar:
-            return avatar.image.url
+        if avatar and request:
+            print('smal_URL', request.build_absolute_uri(obj.image.url))
+            return request.build_absolute_uri(obj.image.url)
         return None
     def get_avatar_full_url(self, obj):
         avatar = obj.gallery_avatars.filter( image__icontains="full").first()
