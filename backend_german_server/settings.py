@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework.authentication',
     'rest_framework.authtoken',
     'accounts',
+    'support_chat',
 
 ]
 

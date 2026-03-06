@@ -1,6 +1,5 @@
 import uuid
 
-from rest_framework.permissions import AllowAny
 from django.shortcuts import redirect
 from django.urls import reverse
 from rest_framework.views import APIView
@@ -20,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, SyncProgressSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from .models import User, EmailVerification, UserGalleryAvatar
 
 from accounts.utils import send_verification_email, get_max_gallery_avatars
@@ -621,3 +620,4 @@ class SyncUserGalleryAvatarView(APIView):
                 "is_verified": user.is_verified
             }
         }, status=status.HTTP_200_OK)
+
