@@ -98,7 +98,6 @@ class CheckNewMessage(APIView):
     def get(self, request):
 
         print('REQUEST_check_message', request.user)
-        print('REQUEST_DATA', request.GET.data)
         print('REQUEST_DATA1', request.GET)
         print('REQUEST_DATA2', request.query_params)
 
