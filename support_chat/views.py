@@ -29,7 +29,7 @@ class SupportMessageSendView(APIView):
         user = request.user
         print('REQUETE', request.data)
 
-        receiver = User.objects.get(uid=int(request.data.get('receiver')))
+        receiver = User.objects.get(uid=int(request.data.get('receiver_uid')))
         text = request.data.get('text')
         print(receiver, text)
         message = Support_message.objects.create(
