@@ -29,7 +29,7 @@ class SupportMessageSendView(APIView):
         user = request.user
         print('REQUETE', request.data)
 
-        receiver = User.objects.get(id=int(request.data.get('receiver')))
+        receiver = User.objects.get(uid=int(request.data.get('receiver')))
         text = request.data.get('text')
         print(receiver, text)
         message = Support_message.objects.create(
@@ -43,10 +43,12 @@ class SupportMessageSendView(APIView):
             "id": message.id,
             "sender": {
                 "id": message.sender.id,
+                "uid": message.sender.uid,
                 "username": message.sender.username
             },
             "receiver": {
                 "id": message.receiver.id,
+                "uid": message.receiver.uid,
                 "username": message.receiver.username
             },
             "text": message.text,
@@ -84,8 +86,16 @@ class SupportMessageAdminAnswerSendView(APIView):
         return Response({
             "id": message.id,
             "atl_message_id": alt_message.id,
-            "sender": {"id": message.sender.id, "username": message.sender.username},
-            "receiver": {"id": message.receiver.id, "username": message.receiver.username},
+            "sender": {
+                "id": message.sender.id,
+                "uid": message.sender.uid,
+                "username": message.sender.username
+            },
+            "receiver": {
+                "id": message.receiver.id,
+                "uid": message.receiver.uid,
+                "username": message.receiver.username
+            },
             "text": message.text,
             "reply_to": alt_message.text,  
             "created_at": message.created_at,
@@ -97,8 +107,6 @@ class CheckNewMessage(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
 
-        print('REQUEST_check_message', request.user)
-        print('REQUEST_DATA1', request.GET)
         print('REQUEST_DATA2', request.query_params)
 
         last_message_id = request.GET.get("last_message_id")
