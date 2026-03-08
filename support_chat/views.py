@@ -101,7 +101,7 @@ class CheckNewMessage(APIView):
         print('REQUEST_DATA1', request.GET)
         print('REQUEST_DATA2', request.query_params)
 
-        last_message_id = request.data.get("last_message_id")
+        last_message_id = request.GET.get("last_message_id")
         messages = Support_message.objects.filter(
             receiver=request.user, id__gt=last_message_id)
         serializer = SupportMessageSerializer(messages, many=True)
