@@ -28,12 +28,12 @@ class SupportMessageSerializer(serializers.ModelSerializer):
             return obj.reply_to.text
         return None
 
-    def get_receiver_UID(self, obj):
+    def get_receiver_uid(self, obj):
         if obj.receiver:
             return obj.receiver.uid
         return None
 
-    def get_sender_UID(self, obj):
+    def get_sender_uid(self, obj):
         if obj.sender:
             return obj.sender.uid
         return None
