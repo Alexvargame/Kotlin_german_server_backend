@@ -6,16 +6,17 @@ from django.utils import timezone
 class SupportMessageSerializer(serializers.ModelSerializer):
 
     reply_to_text = serializers.SerializerMethodField()
-    sender_UID = serializers.SerializerMethodField()
-    receiver_UID = serializers.SerializerMethodField()
+    sender_uid = serializers.SerializerMethodField()
+    receiver_uid = serializers.SerializerMethodField()
 
     class Meta:
         model = Support_message
         fields = (
+            'id',
             'sender',
-            'sender_UID',
+            'sender_uid',
             'receiver',
-            'receiver_UID',
+            'receiver_uid',
             'text',
             'reply_to_text',
             'created_at',

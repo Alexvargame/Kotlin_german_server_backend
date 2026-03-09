@@ -113,6 +113,7 @@ class CheckNewMessage(APIView):
         messages = Support_message.objects.filter(
             receiver=request.user, id__gt=last_message_id)
         print('MESS', messages)
+        print('MESSS_DICT', messages.__dict__)
         serializer = SupportMessageSerializer(messages, many=True)
         return Response(serializer.data)
 
