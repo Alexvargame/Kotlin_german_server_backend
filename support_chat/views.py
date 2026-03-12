@@ -83,35 +83,25 @@ class SupportMessageAdminAnswerSendView(APIView):
             alt_message.is_read = True
             alt_message.save()
         print(message)
+
         return Response({
             "id": message.id,
-            "sender": message.sender.id,
-            "sender_uid": message.sender.uid,
-            "receiver": message.receiver.id,
-            "receiver_uid": message.receiver.uid,
+            "atl_message_id": alt_message.id,
+            "sender": {
+                "id": message.sender.id,
+                "uid": message.sender.uid,
+                "username": message.sender.username
+            },
+            "receiver": {
+                "id": message.receiver.id,
+                "uid": message.receiver.uid,
+                "username": message.receiver.username
+            },
             "text": message.text,
-            "reply_to": message.reply_to.id if message.reply_to else None,
+            "reply_to": alt_message.text,
             "created_at": message.created_at,
             "is_read": message.is_read
         })
-        # return Response({
-        #     "id": message.id,
-        #     "atl_message_id": alt_message.id,
-        #     "sender": {
-        #         "id": message.sender.id,
-        #         "uid": message.sender.uid,
-        #         "username": message.sender.username
-        #     },
-        #     "receiver": {
-        #         "id": message.receiver.id,
-        #         "uid": message.receiver.uid,
-        #         "username": message.receiver.username
-        #     },
-        #     "text": message.text,
-        #     "reply_to": alt_message.text,
-        #     "created_at": message.created_at,
-        #     "is_read": message.is_read
-        # })
 
 
 class CheckNewMessage(APIView):
