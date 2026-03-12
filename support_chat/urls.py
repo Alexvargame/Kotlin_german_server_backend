@@ -7,6 +7,7 @@ from .views import (
     SupportMessageAdminAnswerSendView,
     CheckNewMessage,
     ReadedMessage,
+    SupportMessageDeleteView
     )
 
 urlpatterns = [
@@ -14,6 +15,7 @@ urlpatterns = [
     path('answer_message/', SupportMessageAdminAnswerSendView.as_view(), name='answer_message'),
     path('check_new_message/', CheckNewMessage.as_view(), name='check_new_message'),
     path('readed_message/', ReadedMessage.as_view(), name='readed_message'),
+    path("delete_message/", SupportMessageDeleteView.as_view(), name="support_message_delete"),
 
 ]
 if settings.DEBUG:

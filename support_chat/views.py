@@ -131,3 +131,36 @@ class ReadedMessage(APIView):
         if not messages:
             return Response(f"Новых прочитанных сообщений у пользователя нет")
         return Response({"status": 'Ok'})
+
+
+class SupportMessageDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        server_id = request.data.get("server_id")
+        print('SErver_id', server_id)
+        if not server_id:
+            return Response(
+                {"detail": "server_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            message = Support_message.objects.get(id=server_id)
+            print('Mess', message)
+        except Support_message.DoesNotExist:
+            return Response(
+                {"detail": "Message not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # проверяем, что пользователь может удалить только свои сообщения
+        print('senndUid', message.sender.uid, 'req_user', request.user.uid)
+        if message.sender.uid != request.user.uid:
+            return Response(
+                {"detail": "Forbidden"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        message.delete()
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
