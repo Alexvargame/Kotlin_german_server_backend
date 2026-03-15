@@ -349,7 +349,7 @@ class GetSenderByUid(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        print('RATING', request.data)
+        print('RATING', request.query_params)
         user_sender = User.objects.get(uid=request.data.get('sender_uid'))
         serializer = UserSerializer(user_sender)
         return Response(serializer.data)

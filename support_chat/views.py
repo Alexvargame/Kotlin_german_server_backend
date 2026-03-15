@@ -108,9 +108,9 @@ class CheckNewMessage(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
 
-        print('REQUEST_DATA2', request.data)
+        print('REQUEST_DATA2', request.query_params)
 
-        last_message_id = request.data.get("last_message_id")
+        last_message_id = request.query_params.get("last_message_id")
         messages = Support_message.objects.filter(
             receiver=request.user, id__gt=last_message_id)
         print('MESS', messages)
