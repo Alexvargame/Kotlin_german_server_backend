@@ -342,6 +342,31 @@ class RatingView(APIView):
                     },
                 }
         )
+
+
+class GetSenderByUid(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print('RATING', request.data)
+        user_sender = User.objects.get(uid=request.data.get('sender_uid'))
+        serializer = UserSerializer(user_sender)
+        return Response(serializer.data)
+
+class GetAllSendersByUser(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print()
+        messages = request.user.message_receiver.all()
+        print("MESSs", messages)
+        senders = [mes.sender for mes in messages]
+        print("Sennder", senders)
+        serializer = UserSerializer(list(set(senders)), many=True)
+        return Response(serializer.data)
+
 class UploadGalleryAvatarView(APIView):
     permission_classes = [IsAuthenticated]
 

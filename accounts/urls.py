@@ -13,11 +13,12 @@ from .views import (
     DeleteUserView,
     SyncUserProgressiveView,
     RatingView,
-    UploadGalleryAvatarView,
     SelectActiveGalleryAvatarView,
     DeleteGalleryAvatarView,
     SyncUserAvatarView,
     SyncUserGalleryAvatarView,
+    GetAllSendersByUser,
+    GetSenderByUid,
 )
 
 urlpatterns = [
@@ -25,6 +26,8 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('verify-email/', VerifyEmailView.as_view()),
     path('profile/', ProfileView.as_view()),
+    path('get_sender/', GetSenderByUid.as_view(), name='get_sender'),
+    path('get_all_senders/', GetAllSendersByUser.as_view(), name='get_all_senders'),
     path('verification-success/', VerificationSuccessView.as_view(), name='verification_success'),
     path('sync-user/', SyncUserView.as_view()),
     path('resend-verification/', ResendVerificationView.as_view(), name='resend_verification'),
