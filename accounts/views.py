@@ -350,7 +350,7 @@ class GetSenderByUid(APIView):
 
     def get(self, request):
         print('RATING', request.query_params)
-        user_sender = User.objects.get(uid=request.data.get('sender_uid'))
+        user_sender = User.objects.get(uid=request.query_params.get('sender_uid'))
         serializer = UserSerializer(user_sender)
         return Response(serializer.data)
 
