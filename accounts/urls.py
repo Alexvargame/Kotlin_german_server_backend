@@ -19,6 +19,7 @@ from .views import (
     SyncUserGalleryAvatarView,
     GetAllSendersByUser,
     GetSenderByUid,
+    GetAllAdmin,
 )
 
 urlpatterns = [
@@ -28,6 +29,7 @@ urlpatterns = [
     path('profile/', ProfileView.as_view()),
     path('get_sender/', GetSenderByUid.as_view(), name='get_sender'),
     path('get_all_senders/', GetAllSendersByUser.as_view(), name='get_all_senders'),
+    path('get_all_admin/', GetAllAdmin.as_view(), name='get_all_admin'),
     path('verification-success/', VerificationSuccessView.as_view(), name='verification_success'),
     path('sync-user/', SyncUserView.as_view()),
     path('resend-verification/', ResendVerificationView.as_view(), name='resend_verification'),

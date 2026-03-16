@@ -367,6 +367,17 @@ class GetAllSendersByUser(APIView):
         serializer = UserSerializer(list(set(senders)), many=True)
         return Response(serializer.data)
 
+class GetAllAdmin(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print()
+        admins = User.objects.filter(is_staff=True)
+        print("MESSs", admins)
+        serializer = UserSerializer(admins, many=True)
+        return Response(serializer.data)
+
 class UploadGalleryAvatarView(APIView):
     permission_classes = [IsAuthenticated]
 
