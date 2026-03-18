@@ -56,6 +56,12 @@ def send_verification_email(email, token):
         print(f"[DEBUG][3] Условие 'PYTHONANYWHERE_DOMAIN in os.environ' = ИСТИНА. Использую SendGrid API.")
         try:
             return send_email_via_sendgrid_api(email, token)
+        except python_http_client.exceptions.UnauthorizedError as e:
+            # ⬇️ ВОТ ЭТО ДОБАВЬ ⬇️
+            print(f"❌ SendGrid 401. Тело ответа: {e.body}")
+            # Может быть ещё статус и заголовки
+            print(f"Status: {e.status_code}, Headers: {e.headers}")
+            return False
         except ImportError as e:
             print(f"⚠️ [DEBUG][4] Cannot import SendGrid helper: {e}")
             # Продолжаем на SMTP (для надёжности)
