@@ -1,4 +1,6 @@
 import logging
+
+import python_http_client
 from django.conf import settings
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -28,6 +30,11 @@ def send_email_via_sendgrid_api(email, token):
         response = sg.send(message)
         print(f"[DEBUG-SendGrid][E] ✅ Отправка через API успешна! Статус: {response.status_code}")
         return True
+    except python_http_client.exceptions.UnauthorizedError as e:
+        # 👇 Здесь будет тело ответа с причиной
+        print(f"[DEBUG-SendGrid][F] ❌ 401 Unauthorized. Тело ответа: {e.body}")
+        print(f"Статус: {e.status_code}, Заголовки: {e.headers}")
+        return False
     except Exception as e:
         print(f"[DEBUG-SendGrid][F] ❌ КРИТИЧЕСКАЯ ОШИБКА в SendGrid API: {e}")
         return False
