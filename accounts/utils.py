@@ -1,4 +1,5 @@
 # accounts/utils.py
+import python_http_client
 from django.core.mail import send_mail
 from django.conf import settings
 import os
