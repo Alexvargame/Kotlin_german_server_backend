@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, EmailVerification, PhoneVerification, UserGalleryAvatar
+from .models import User, EmailVerification, PhoneVerification, UserGalleryAvatar, Device
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -23,3 +23,7 @@ class PhoneVerificationAdmin(admin.ModelAdmin):
 @admin.register(UserGalleryAvatar)
 class UserAvatarGallereyAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'image', 'is_active', 'created_at')
+
+@admin.register(Device)
+class DeviceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'user', 'fcm_token')

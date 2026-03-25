@@ -20,7 +20,7 @@ from rest_framework.authentication import TokenAuthentication
 
 
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
-from .models import User, EmailVerification, UserGalleryAvatar
+from .models import User, EmailVerification, UserGalleryAvatar, Device
 
 from accounts.utils import send_verification_email, get_max_gallery_avatars
 #
@@ -657,3 +657,31 @@ class SyncUserGalleryAvatarView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
+
+class GetFCMDeviceTokenView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        print('reuest_POST', request.data)
+
+        token = request.data.get("fcm_token")
+        device_name = request.data.get("device_name", "unknown")
+
+        if not token:
+            return Response({"error": "FCM token is required"}, status=400)
+
+        # Сохраняем или обновляем устройство
+        updated_device = Device.objects.update_or_create(
+            user=request.user,
+            name=device_name,
+            defaults={"fcm_token": token}
+        )
+        print('UP', updated_device)
+        if updated_device:
+            return Response({
+                'name_device': updated_device[0].name,
+                'user': updated_device[0].user.username,
+                'fcm_token': updated_device[0].fcm_token
+                }, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

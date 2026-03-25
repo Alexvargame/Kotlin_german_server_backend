@@ -20,6 +20,7 @@ from .views import (
     GetAllSendersByUser,
     GetSenderByUid,
     GetAllAdmin,
+    GetFCMDeviceTokenView
 )
 
 urlpatterns = [
@@ -28,6 +29,7 @@ urlpatterns = [
     path('verify-email/', VerifyEmailView.as_view()),
     path('profile/', ProfileView.as_view()),
     path('get_sender/', GetSenderByUid.as_view(), name='get_sender'),
+    path('get_fcm_token/', GetFCMDeviceTokenView.as_view(), name='get_fcm_token'),
     path('get_all_senders/', GetAllSendersByUser.as_view(), name='get_all_senders'),
     path('get_all_admin/', GetAllAdmin.as_view(), name='get_all_admin'),
     path('verification-success/', VerificationSuccessView.as_view(), name='verification_success'),
