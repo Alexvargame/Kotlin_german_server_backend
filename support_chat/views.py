@@ -71,7 +71,7 @@ class SupportMessageAdminAnswerSendView(APIView):
 
     def post(self, request):
 
-        print('REQUETE', request.data)
+        print('REQUETE_answr', request.data)
 
         sender = User.objects.filter(is_staff=True).first()
         try:
@@ -82,7 +82,7 @@ class SupportMessageAdminAnswerSendView(APIView):
         receiver = alt_message.sender
         answer = request.data.get('answer')
         text = alt_message.text
-        print(receiver, text, answer)
+        print("data_aBNSWER", receiver, text, answer)
         message = Support_message.objects.create(
             sender=sender,
             receiver=receiver,
