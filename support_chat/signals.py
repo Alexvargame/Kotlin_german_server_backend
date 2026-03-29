@@ -21,8 +21,12 @@ def send_notification_on_message(sender, instance, created, **kwargs):
 
         for device in devices:
             send_push(
-                token=device.fcm_token,
+                fcm_token=device.fcm_token,
                 title="Внимание",
-                body = "У вас новое сообщение",
-                data_fcm = {'user_uid': str(instance.sender.uid), 'email': instance.sender.email}
+                body="У вас новое сообщение",
+                data=
+                    {
+                        'user_uid': str(instance.sender.uid),
+                     'email': instance.sender.email
+                     }
             )
