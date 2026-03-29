@@ -19,7 +19,8 @@ from rest_framework.authentication import TokenAuthentication
 
 from .models import Support_message
 from .serializers import SupportMessageSerializer
-from accounts.models import User
+from .utils import send_push
+from accounts.models import User, Device
 
 
 class SupportMessageSendView(APIView):
@@ -38,6 +39,15 @@ class SupportMessageSendView(APIView):
             text=text
         )
         print(message)
+        devices = user.devices.all()
+        print('DEV', devices)
+        title = "Внимание"
+        body = "У вас новое сообщение"
+
+        data_fcm = {'user_uid': str(user.uid), 'email': user.email}
+        for device in devices:
+            send_push(device.fcm_token, title, body, data_fcm)
+
         return Response(
             {
             "id": message.id,
