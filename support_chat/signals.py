@@ -2,6 +2,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Support_message
+from accounts.models import Device
 from .utils import send_push
 
 
@@ -16,13 +17,12 @@ def send_notification_on_message(sender, instance, created, **kwargs):
         # Здесь логика: у instance есть связь с пользователем-получателем
         # и у пользователя есть fcm_token
 
-        recipient = instance.receiver  # пример, подставь своё поле
-        fcm_token = recipient.fcm_token  # пример, подставь своё поле
+        devices = Device.objects.filter(user=instance.receiver)
 
-        if fcm_token:
+        for device in devices:
             send_push(
-                token=fcm_token,
-                title="Новое сообщение",
-                body=instance.text[:100],  # первые 100 символов
-                data={"message_id": str(instance.id)}
+                token=device.fcm_token,
+                title="Внимание",
+                body = "У вас новое сообщение",
+                data_fcm = {'user_uid': str(instance.sender.uid), 'email': instance.sender.email}
             )
