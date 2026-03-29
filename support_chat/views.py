@@ -92,13 +92,13 @@ class SupportMessageAdminAnswerSendView(APIView):
         if not receiver.is_staff:
             alt_message.is_read = True
             alt_message.save()
-        print(message)
+        print("MEssage -Answer", message)
         devices = receiver.devices.all()
         print('DEV', devices)
         title = "Внимание"
         body = "У вас новое сообщение"
 
-        data_fcm = {'user_uid': str(receiver.uid), 'email': receiver.email}
+        data_fcm = {'user_uid': str(sender.uid), 'email': sender.email}
         for device in devices:
             send_push(device.fcm_token, title, body, data_fcm)
 
