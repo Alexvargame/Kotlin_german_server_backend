@@ -39,14 +39,14 @@ class SupportMessageSendView(APIView):
             text=text
         )
         print(message)
-        # devices = user.devices.all()
-        # print('DEV', devices)
-        # title = "Внимание"
-        # body = "У вас новое сообщение"
-        #
-        # data_fcm = {'user_uid': str(user.uid), 'email': user.email}
-        # for device in devices:
-        #     send_push(device.fcm_token, title, body, data_fcm)
+        devices = receiver.devices.all()
+        print('DEV', devices)
+        title = "Внимание"
+        body = "У вас новое сообщение"
+
+        data_fcm = {'user_uid': str(user.uid), 'email': user.email}
+        for device in devices:
+            send_push(device.fcm_token, title, body, data_fcm)
 
         return Response(
             {
