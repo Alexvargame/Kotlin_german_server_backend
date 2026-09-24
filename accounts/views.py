@@ -174,6 +174,7 @@ class SyncUserProgressiveView(APIView):
             "streak_days": request.data.get('streak_days'),
             "lifes": request.data.get('lifes'),
             "last_session_date": request.data.get('last_session_date'),
+            "last_login_date": request.data.get('last_login_date'),
         }
         print('APP_DATA', app_data)
         if app_data["last_session_date"] is None:
@@ -200,8 +201,10 @@ class SyncUserProgressiveView(APIView):
             'last_session_date': user.last_session_date if user.last_session_date else 0
         }
         print("SERVER DATA", server_data)
-        app_date = app_data['last_session_date'] or 0
-        server_date = server_data['last_session_date'] or 0
+        # app_date = app_data['last_session_date'] or 0
+        # server_date = server_data['last_session_date'] or 0
+        app_date = app_data['last_login_date'] or 0
+        server_date = int(user.last_login_date.timestamp() * 1000) if user.last_login_date else 0
         print(app_data['last_session_date'], server_data['last_session_date'])
         if app_date >= server_date:
             # Обновляем сервер данными из приложения
@@ -209,6 +212,11 @@ class SyncUserProgressiveView(APIView):
             user.streak_days = app_data['streak_days']
             user.lifes = app_data['lifes']
             user.last_session_date = app_data['last_session_date']
+            if app_data['last_login_date']:
+                user.last_login_date = datetime.datetime.fromtimestamp(
+                    app_data['last_login_date'] / 1000,
+                    tz=datetime.timezone.utc
+                )
             user.save()
             updated = True
             returned_data = app_data
