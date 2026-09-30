@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_verified',
             'created_at',
             'last_session_date',
-            'last_login_date',
+            ##'last_login_date',
             'avatar_name',
             'avatar_path',
             'active_gallery_avatar_url',
