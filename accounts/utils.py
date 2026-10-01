@@ -3,9 +3,10 @@ import python_http_client
 from django.core.mail import send_mail
 from django.conf import settings
 import os
-from .sendgrid_helper import send_email_via_sendgrid_api, send_email_via_brevo_api
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+# from .sendgrid_helper import send_email_via_sendgrid_api,
+from .brevo_helper import send_email_via_brevo_api
+# from sendgrid import SendGridAPIClient
+# from sendgrid.helpers.mail import Mail
 def send_test_email(to_email):
     send_mail(
         subject='Test Email',
