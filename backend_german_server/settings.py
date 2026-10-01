@@ -163,7 +163,8 @@ REST_FRAMEWORK = {
 # DEFAULT_FROM_EMAIL = 'a_odegov@ukr.net'
 
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-DEFAULT_FROM_EMAIL = 'a_odegov@ukr.net'  # Должен быть верифицирован в SendGrid
+BREVO_API_KEY = os.getenv('BREVO_API_KEY')
+DEFAULT_FROM_EMAIL = 'a_odegov@ukr.net'  # Должен быть верифицирован в B
 
 
 

@@ -3,13 +3,13 @@ import python_http_client
 from django.core.mail import send_mail
 from django.conf import settings
 import os
-from .sendgrid_helper import send_email_via_sendgrid_api
+from .sendgrid_helper import send_email_via_sendgrid_api, send_email_via_brevo_api
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 def send_test_email(to_email):
     send_mail(
         subject='Test Email',
-        message='Hello! This is a test from Django + SendGrid',
+        message='Hello! This is a test from Django + Brevo',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[to_email],
         fail_silently=False,
@@ -48,15 +48,15 @@ def send_verification_email(email, token):
     verify_url = f'https://alexdirect.pythonanywhere.com/api/verify-email/?token={token}'
     print(f"[DEBUG][1] Вызов send_verification_email для {email}")
     print(f"[DEBUG][2] Переменная PYTHONANYWHERE_DOMAIN = {os.environ.get('PYTHONANYWHERE_DOMAIN')}")
-    print(f"[SHOWTIME] 1. Ключ SENDGRID_API_KEY в настройках: {settings.SENDGRID_API_KEY}")
-    print(f"[SHOWTIME] 2. Ключ из окружения напрямую: {os.getenv('SENDGRID_API_KEY')}")
+    print(f"[SHOWTIME] 1. Ключ BREVO_API_KEY в настройках: {settings.BREVO_API_KEY}")
+    print(f"[SHOWTIME] 2. Ключ из окружения напрямую: {os.getenv('BREVO_API_KEY')}")
     print(f"[SHOWTIME] 3. PYTHONANYWHERE_DOMAIN из окружения: {os.getenv('PYTHONANYWHERE_DOMAIN')}")
     print(f"[SHOWTIME] 4. Весь os.environ содержит PYTHONANYWHERE_DOMAIN?: {'PYTHONANYWHERE_DOMAIN' in os.environ}")
     # Проверяем, находимся ли на PythonAnywhere
     if 'PYTHONANYWHERE_DOMAIN' in os.environ:  # Более надёжный способ
         print(f"[DEBUG][3] Условие 'PYTHONANYWHERE_DOMAIN in os.environ' = ИСТИНА. Использую SendGrid API.")
         try:
-            return send_email_via_sendgrid_api(email, token)
+            return send_email_via_brevo_api(email, token)
         except python_http_client.exceptions.UnauthorizedError as e:
             # ⬇️ ВОТ ЭТО ДОБАВЬ ⬇️
             print(f"❌ SendGrid 401. Тело ответа: {e.body}")
