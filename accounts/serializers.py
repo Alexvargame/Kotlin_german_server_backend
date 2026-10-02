@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     avatar_last_changed = serializers.SerializerMethodField()
     avatar_small_url = serializers.SerializerMethodField()
     avatar_full_url = serializers.SerializerMethodField()
+    last_login_date = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = (
@@ -20,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_verified',
             'created_at',
             'last_session_date',
-            ##'last_login_date',
+            'last_login_date',
             'avatar_name',
             'avatar_path',
             'active_gallery_avatar_url',
@@ -62,6 +63,12 @@ class UserSerializer(serializers.ModelSerializer):
         if avatar:
             return avatar.image.url
         return None
+
+    def get_last_login_date(self, obj):
+        print(f"[SERIALIZER] get_last_login_date вызван для {obj.email}, значение = {obj.last_login_date}")
+        result = int(obj.last_login_date.timestamp() * 1000) if obj.last_login_date else None
+        print(f"[SERIALIZER] возвращаю = {result}")
+        return result
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
