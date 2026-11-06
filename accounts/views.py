@@ -191,7 +191,8 @@ class SyncUserProgressiveView(APIView):
                     "uid": str(user.uid),
                     "email": user.email,
                     "username": user.username,
-                    "is_verified": user.is_verified
+                    "is_verified": user.is_verified,
+                    "is_admin": is_admin,
                 }
             })
         server_data = {

@@ -5,8 +5,10 @@ from .models import User, EmailVerification, PhoneVerification, UserGalleryAvata
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'email', 'uid', 'username', 'score', 'streak_days', 'lifes',
                     'avatar_name', 'avatar_path', 'last_login_date', 'last_session_date',
-                    'is_verified', 'is_active', 'created_at', 'is_superuser', 'is_staff')
+                    'is_verified', 'is_active', 'created_at', 'is_superuser', 'is_staff',
+                    'is_admin')
     search_fields = ('email', 'uid')
+    list_editable = ['is_admin']
     list_filter = ('is_verified', 'is_active')
 
 @admin.register(EmailVerification)

@@ -28,6 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar_full_url',
             'is_staff',
             'is_superuser',
+            'is_admin'
         )
 
     def get_active_gallery_avatar_url(self, obj):
